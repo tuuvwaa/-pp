@@ -166,26 +166,33 @@ toggleButton.Parent = screenGui
 -- Biến trạng thái
 local isVisible = true
 
--- Lấy đối tượng giao diện chính của redzlib (giả sử có thuộc tính Enabled)
-local mainGui = Window -- Giả định Window là giao diện chính
-if mainGui and mainGui.Main then
-    mainGui = mainGui.Main -- Nếu có thuộc tính Main, dùng nó
+-- Thử lấy giao diện chính của redzlib
+local mainGui = nil
+if Window and typeof(Window) == "table" then
+    for k, v in pairs(Window) do
+        if v:IsA("ScreenGui") or v:IsA("Frame") then
+            mainGui = v
+            break
+        end
+    end
 end
 
--- Xử lý sự kiện khi nhấn nút
-toggleButton.MouseButton1Click:Connect(function()
-    isVisible = not isVisible
-    if mainGui and mainGui.Enabled ~= nil then
-        mainGui.Enabled = isVisible -- Sử dụng thuộc tính Enabled để ẩn/hiện
-        if isVisible then
-            toggleButton.Image = "rbxassetid://112455697889846" -- Hiển thị (mũi tên sang phải)
-        else
-            toggleButton.Image = "rbxassetid://112455697889846" -- Ẩn (mũi tên sang trái)
+if not mainGui then
+    warn("Không tìm thấy giao diện chính của redzlib. Vui lòng kiểm tra tài liệu!")
+else
+    -- Xử lý sự kiện khi nhấn nút
+    toggleButton.MouseButton1Click:Connect(function()
+        isVisible = not isVisible
+        if mainGui then
+            mainGui.Visible = isVisible -- Sử dụng thuộc tính Visible để ẩn/hiện
+            if isVisible then
+                toggleButton.Image = "rbxassetid://112455697889846" -- Hiển thị (mũi tên sang phải)
+            else
+                toggleButton.Image = "rbxassetid://112455697889846" -- Ẩn (mũi tên sang trái)
+            end
         end
-    else
-        warn("Không thể điều khiển hiển thị. Kiểm tra tài liệu redzlib!")
-    end
-end)
+    end)
+end
 
 -- Làm nút có thể kéo thả
 local dragging
@@ -212,14 +219,4 @@ toggleButton.InputChanged:Connect(function(input)
     end
 end)
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        toggleButton.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-end)
+game:GetService("
