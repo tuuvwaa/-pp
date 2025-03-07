@@ -166,15 +166,24 @@ toggleButton.Parent = screenGui
 -- Biến trạng thái
 local isVisible = true
 
+-- Lấy đối tượng giao diện chính của redzlib (giả sử có thuộc tính Enabled)
+local mainGui = Window -- Giả định Window là giao diện chính
+if mainGui and mainGui.Main then
+    mainGui = mainGui.Main -- Nếu có thuộc tính Main, dùng nó
+end
+
 -- Xử lý sự kiện khi nhấn nút
 toggleButton.MouseButton1Click:Connect(function()
     isVisible = not isVisible
-    if isVisible then
-        Window:Show() -- Hiển thị hub
-        toggleButton.Image = "rbxassetid://112455697889846" -- Mũi tên sang phải (hiển thị)
+    if mainGui and mainGui.Enabled ~= nil then
+        mainGui.Enabled = isVisible -- Sử dụng thuộc tính Enabled để ẩn/hiện
+        if isVisible then
+            toggleButton.Image = "rbxassetid://112455697889846" -- Hiển thị (mũi tên sang phải)
+        else
+            toggleButton.Image = "rbxassetid://112455697889846" -- Ẩn (mũi tên sang trái)
+        end
     else
-        Window:Hide() -- Ẩn hub
-        toggleButton.Image = "rbxassetid://112455697889846" -- Mũi tên sang trái (ẩn)
+        warn("Không thể điều khiển hiển thị. Kiểm tra tài liệu redzlib!")
     end
 end)
 
